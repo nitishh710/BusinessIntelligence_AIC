@@ -140,8 +140,10 @@ with st.sidebar:
     st.info(f"**Security Context:** Operating securely as `{persona}`. Narrative tone and action levers are dynamically adjusted.")
     
     st.markdown("---")
-    st.markdown("**Developed by Team [Insert Team Name]**") 
-
+    st.markdown("**Developed by Team [anshus24]**") 
+    # st.markdown("**Anshu Sharma**") 
+    # st.markdown("**Nitish **") 
+    # st.markdown("**Dipu Pradhan**") 
 # Main Dashboard layout
 st.title("KPI Storytelling Copilot")
 st.markdown("*Hybrid Architecture: Deterministic Math Engine + Conversational AI Synthesizer*")
