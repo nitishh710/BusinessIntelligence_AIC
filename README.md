@@ -1,30 +1,28 @@
-🧠 BusinessIntelligence.ai: KPI Storytelling Engine
+BusinessIntelligence.ai: KPI Storytelling Engine
 
 Accenture Innovation Challenge 2026 - Round 2 Submission
 
 Problem Track 3: BusinessIntelligence.ai
 
-Repository: https://github.com/nitishh710/BusinessIntelligence_AIC
+Watch the Prototype Demo Video Here
 
-🎥 [Insert your Video Demo Link Here]
-
-📌 Executive Summary
+Executive Summary
 
 Modern Business Intelligence (BI) dashboards are fundamentally passive. They excel at displaying what a metric is (e.g., "Revenue dropped by 8%"), but consistently fail to explain why it happened or what concrete action leaders should take next.
 
-BusinessIntelligence.ai bridges the gap between raw data and executive decision-making. Built strictly around the core directive of Round 2—"The LLM should not be treated as the source of quantitative truth"—our solution employs a Hybrid Architecture.
+BusinessIntelligence.ai connects the raw data to executive decision-making. Built strictly around the core directive of Round 2—"The LLM should not be treated as the source of quantitative truth"—our solution uses a Hybrid Architecture.
 
-🏗️ The Hybrid Architecture
+The Hybrid Architecture
 
 Deterministic Analytical Engine (Python/Math): Handles all quantitative calculations, multi-factor variance decomposition, missing data validation, and confidence scoring. The LLM is completely isolated from doing math.
 
 Contextual Synthesizer (LLM Layer): Takes the hard mathematical facts and translates them into role-tailored narratives and actionable operational steps.
 
-✨ Addressing the Evaluation Criteria
+Addressing the Evaluation Criteria
 
 Round 2 PDF Requirement
 
-How We Implemented It in the Prototype
+Implementation in Prototype
 
 1. Multi-Factor KPI Movement
 
@@ -54,7 +52,7 @@ Outputs map strictly to: Driver -> Action -> Impact -> Owner -> Monitoring Plan.
 
 Live UI metrics displaying execution latency, token consumption, and cost per insight ($).
 
-🚀 Execution Instructions
+Execution Instructions
 
 1. Clone the repository
 
@@ -62,8 +60,8 @@ git clone https://github.com/nitishh710/BusinessIntelligence_AIC.git
 cd BusinessIntelligence_AIC
 
 
-2. Set up a Virtual Environment (Recommended)
-To avoid modifying system packages and encountering the "externally-managed-environment" error on newer Linux/macOS systems, set up a virtual environment:
+2. Set up a Virtual Environment (Recommended for Linux/macOS)
+To avoid modifying system packages and encountering the "externally-managed-environment" error:
 
 python3 -m venv venv
 source venv/bin/activate
