@@ -18,10 +18,10 @@ st.markdown("""
 <style>
     .main { background: #0e1117; color: #fafafa; }
     .stMetric { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
-    .narrative-box { background: rgba(99, 102, 241, 0.1); border-left: 4px solid #6366f1; padding: 20px; border-radius: 5px; margin-top: 10px; }
-    .abstain-box { background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; padding: 20px; border-radius: 5px; margin-top: 10px; }
+    .narrative-box { background: rgba(99, 102, 241, 0.1); border-left: 4px solid #6366f1; padding: 20px; border-radius: 5px; margin-top: 10px; font-size: 1.05rem; line-height: 1.6;}
+    .abstain-box { background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; padding: 20px; border-radius: 5px; margin-top: 10px; font-size: 1.05rem; line-height: 1.6;}
 </style>
-""", unsafe_allow_mode=True)
+""", unsafe_allow_html=True)
 
 # --- MOCK DATA GENERATION (Simulating Database ingestion) ---
 def generate_dataset(scenario):
@@ -100,31 +100,31 @@ def run_deterministic_engine(df, scenario):
     return results
 
 # --- 2. CONTEXTUAL SYNTHESIZER (LLM LAYER SIMULATION) ---
-# Translates hard math into persona-specific narratives.
+# Translates hard math into persona-specific, humanoid narratives.
 def generate_llm_narrative(math_results, persona, scenario):
     time.sleep(0.8) # Simulate API call latency
-    tokens = random.randint(150, 300)
+    tokens = random.randint(180, 320)
     
     # SYSTEM ABSTENTION (Handles conflicting/missing data)
     if not math_results["can_synthesize"]:
         return {
-            "narrative": f"⚠️ **SYSTEM ABSTENTION: Insufficient Evidence**\n\nThe deterministic engine calculated a Confidence Score of **{math_results['confidence_score']*100:.0f}%**, which is below the enterprise 70% threshold. Telemetry is missing from the Asia-Pacific node. To prevent hallucinations, root-cause synthesis has been halted.",
-            "rec": {"Driver": "Missing Telemetry", "Action": "Dispatch manual sync ping to APAC IoT Gateway.", "Impact": "Restore data integrity.", "Owner": "IT Ops", "Monitor": "Poll API every 15m"},
+            "narrative": f"⚠️ **System Halted: Incomplete Data Picture**\n\nI'd normally synthesize a root cause for you here, but I have to abstain. Our confidence score just tanked to **{math_results['confidence_score']*100:.0f}%**, which breaks our enterprise safety threshold. \n\nLooking at the lineage, I'm seeing a complete blackout of telemetry data from the Asia-Pacific node. Rather than guessing or hallucinating an answer, I strongly recommend we pause analysis and get IT involved to restore data integrity first.",
+            "rec": {"Driver": "Missing APAC Telemetry", "Action": "Dispatch manual sync ping to APAC IoT Gateway.", "Impact": "Restore data integrity and unblock analysis.", "Owner": "IT Operations", "Monitor": "Poll API every 15m"},
             "tokens": tokens, "cost": tokens * 0.000015
         }
 
     # RBAC PERSONALIZATION
     if scenario == "1. Multi-Factor (Revenue Drop)":
         if persona == "Regional Director":
-            narr = f"📉 **Executive Summary:** Revenue dropped **{math_results['math_facts']['Rev_Change']:.1f}%**. Our deterministic model attributes 62% of this variance to a {math_results['math_facts']['Ad_Change']:.1f}% cut in Ad Spend. Organic demand remains stable."
-            rec = {"Driver": "Ad Spend Cut", "Action": "Re-authorize $1,500 marketing budget.", "Impact": "Recover top-line trajectory.", "Owner": "CMO", "Monitor": "Daily ROAS"}
+            narr = f"📉 **Hi there. Looking at this week's numbers, we took a {math_results['math_facts']['Rev_Change']:.1f}% hit to top-line revenue.** \n\nI ran a variance decomposition on the backend, and the primary culprit is pretty clear: the recent **{math_results['math_facts']['Ad_Change']:.1f}% pullback in Ad Spend** is driving about 62% of this drop. The good news? Our organic demand is actually holding steady. If we can get that marketing budget re-authorized quickly, we should bounce right back to our expected trajectory."
+            rec = {"Driver": "Ad Spend Reduction", "Action": "Re-authorize $1,500 marketing budget for the region.", "Impact": "Recover top-line growth trajectory.", "Owner": "CMO", "Monitor": "Daily ROAS"}
         else: # Analyst
-            narr = f"🔍 **Deep Dive:** W06 Revenue dropped {math_results['math_facts']['Rev_Change']:.1f}%. Decomposition breakdown shows Ad Spend (Weight: {math_results['math_facts']['Ad_Weight']}) as the primary constraint. Lineage checks pass with 96% confidence."
-            rec = {"Driver": "Ad Spend Cap", "Action": "Audit campaign manager budget caps.", "Impact": "Unblock paid traffic.", "Owner": "Growth Lead", "Monitor": "Hourly pacing"}
+            narr = f"🔍 **Hey team, heads up on the W06 close: top-line revenue is down {math_results['math_facts']['Rev_Change']:.1f}%.** \n\nI traced the data lineage back through the CRM and AdTech joins, and the math points directly to recent ad budget caps. The decomposition gives Ad Spend a weight of {math_results['math_facts']['Ad_Weight']}, making it our primary constraint. Data confidence is high at 96%, passing all our checks. We should probably ping the growth team to audit those caps before it impacts next week's pacing."
+            rec = {"Driver": "Ad Spend Cap (Campaign Level)", "Action": "Audit campaign manager budget caps and lift constraints.", "Impact": "Unblock paid traffic flow.", "Owner": "Growth Marketing Lead", "Monitor": "Hourly pacing"}
 
     elif scenario == "3. Sparse-History (New Launch)":
-        narr = f"📈 **Launch Update:** Product X tracking at {math_results['math_facts']['Mean_Sales']:.1f} units/day. \n\n⚠️ **Governance Notice for {persona}:** With only {math_results['math_facts']['N_Days']} days of data, confidence is {math_results['confidence_score']*100:.0f}%. Withhold major capital supply adjustments until the 30-day baseline matures."
-        rec = {"Driver": "New Product Launch", "Action": "Maintain steady inventory; do not over-order.", "Impact": "Prevent liability before baseline is set.", "Owner": "Supply Chain", "Monitor": "Daily Maturity Score"}
+        narr = f"📈 **Launch Update:** Product X is off to a solid start, averaging **{math_results['math_facts']['Mean_Sales']:.1f} units per day!** \n\n⚠️ *A quick governance note for you ({persona}):* We only have {math_results['math_facts']['N_Days']} days of live data, so my statistical confidence is currently hovering around {math_results['confidence_score']*100:.0f}%. Let's hold off on making any massive supply chain commitments until we hit our standard 30-day maturity baseline. Better safe than sorry!"
+        rec = {"Driver": "New Product (Immature Baseline)", "Action": "Maintain steady inventory; strictly do not over-order.", "Impact": "Prevent warehouse liability before true demand is known.", "Owner": "Supply Chain Planning", "Monitor": "Daily Baseline Maturity Score"}
 
     return {"narrative": narr, "rec": rec, "tokens": tokens, "cost": tokens * 0.000015}
 
@@ -144,11 +144,11 @@ with st.sidebar:
     persona = st.selectbox("2. Select Role (RBAC)", ["Regional Director", "Operations Analyst"])
     
     st.markdown("---")
-    st.info(f"🔒 **RBAC:** Operating as `{persona}`. Narrative depth is dynamically adjusted.")
+    st.info(f"🔒 **Security Context:** Operating securely as `{persona}`. Narrative tone and action levers are dynamically adjusted.")
 
 # --- MAIN DASHBOARD ---
-st.title("🧠 KPI Storytelling & Decision Engine")
-st.markdown("*Hybrid Architecture: Deterministic Math + LLM Narrative Synthesis*")
+st.title("🧠 KPI Storytelling Copilot")
+st.markdown("*Hybrid Architecture: Deterministic Math Engine + Conversational AI Synthesizer*")
 
 df, source = generate_dataset(scenario)
 engine_results = run_deterministic_engine(df, scenario)
@@ -157,42 +157,42 @@ col1, col2 = st.columns([1.2, 1])
 
 with col1:
     st.subheader("1. Deterministic Math Engine")
-    st.caption("Calculates hard facts, variances, and confidence (No LLM here).")
-    st.markdown(f"**Source:** `{source}`")
+    st.caption("Calculates hard facts, variances, and confidence (Zero LLM logic here).")
+    st.markdown(f"**Source Systems:** `{source}`")
     st.dataframe(df, use_container_width=True, hide_index=True)
     
     c1, c2 = st.columns(2)
     c1.metric("System Confidence", f"{engine_results['confidence_score']*100:.0f}%", 
-              delta="SAFE" if engine_results['confidence_score'] >= 0.7 else "UNSAFE", 
+              delta="SAFE (Passed Threshold)" if engine_results['confidence_score'] >= 0.7 else "UNSAFE (Abstention Triggered)", 
               delta_color="normal" if engine_results['confidence_score'] >= 0.7 else "inverse")
-    c2.metric("Data Lineage Steps", len(engine_results['lineage']))
+    c2.metric("Data Lineage Steps Passed", len(engine_results['lineage']))
 
 with col2:
-    st.subheader("2. Contextual LLM Synthesizer")
-    st.caption(f"Translating math into strategic action for: **{persona}**")
+    st.subheader("2. Contextual AI Copilot")
+    st.caption(f"Translating math into a strategic brief for: **{persona}**")
     
-    with st.spinner("Synthesizing..."):
+    with st.spinner("Analyzing data and generating brief..."):
         synthesis = generate_llm_narrative(engine_results, persona, scenario)
     
     box_class = "narrative-box" if engine_results['can_synthesize'] else "abstain-box"
-    st.markdown(f'<div class="{box_class}">{synthesis["narrative"]}</div>', unsafe_allow_mode=True)
+    st.markdown(f'<div class="{box_class}">{synthesis["narrative"]}</div>', unsafe_allow_html=True)
     
     st.markdown("#### 🎯 Governed Action Plan")
     rec = synthesis["rec"]
     st.markdown(f"""
-    * **Driver:** `{rec['Driver']}`
-    * **Action:** **{rec['Action']}**
-    * **Impact:** {rec['Impact']}
-    * **Owner:** `{rec['Owner']}` (Monitor: *{rec['Monitor']}*)
+    * **Driver identified:** `{rec['Driver']}`
+    * **Recommended Action:** **{rec['Action']}**
+    * **Expected Impact:** {rec['Impact']}
+    * **Task Owner:** `{rec['Owner']}` (Monitoring via: *{rec['Monitor']}*)
     """)
 
 # --- TELEMETRY FOOTER ---
 st.markdown("---")
-st.markdown("#### ⚙️ LLM Runtime Telemetry (Governance)")
+st.markdown("#### ⚙️ Runtime Telemetry (Governance & IT Ops)")
 t1, t2, t3, t4 = st.columns(4)
-t1.metric("Engine Latency", f"{engine_results['latency']:.4f}s")
-t2.metric("LLM Latency", "0.8420s")
-t3.metric("Tokens Used", synthesis['tokens'])
+t1.metric("Math Engine Latency", f"{engine_results['latency']:.4f}s")
+t2.metric("LLM API Latency", "0.8420s")
+t3.metric("Tokens Consumed", synthesis['tokens'])
 t4.metric("Cost per Insight", f"${synthesis['cost']:.5f}")
 
-st.markdown("💬 **Analyst Feedback:** [ 👍 Approve Logic ] | [ 👎 Flag Hallucination ]")
+st.markdown("💬 **Human-in-the-loop Feedback:** [ 👍 Looks good to me ] | [ 👎 This doesn't seem right (Flag for review) ]")
