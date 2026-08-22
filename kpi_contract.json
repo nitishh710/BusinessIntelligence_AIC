@@ -1,0 +1,43 @@
+{
+"contract_version": "2.1.0",
+"domain": "Retail & Supply Chain Operations",
+"last_updated": "2026-08-22",
+"kpis": [
+{
+"kpi_id": "KPI_REV_001",
+"name": "Net Revenue",
+"grain": "Weekly",
+"owner": "Finance & Revenue Ops",
+"formula": "SUM(Gross_Sales) - SUM(Discounts) - SUM(Returns)",
+"baseline_window_days": 30,
+"anomaly_threshold_pct": -5.0,
+"sources": ["CRM_Sales_DB.weekly_transactions"],
+"rbac_visibility": ["Regional Director", "Operations Analyst"],
+"drivers": ["Ad_Spend", "Order_Volume", "Average_Order_Value"]
+},
+{
+"kpi_id": "KPI_SC_002",
+"name": "Supply Chain Fulfillment Delay",
+"grain": "Hourly",
+"owner": "Logistics",
+"formula": "AVG(Actual_Delivery_Time_Hrs - Promised_Delivery_Time_Hrs)",
+"baseline_window_days": 14,
+"anomaly_threshold_pct": 25.0,
+"sources": ["IoT_Warehouse_Telemetry.hourly_logs"],
+"rbac_visibility": ["Operations Analyst", "Regional Director"],
+"drivers": ["Regional_Inventory_Level", "Transit_Dwell_Time"]
+},
+{
+"kpi_id": "KPI_PRD_003",
+"name": "Product X Launch Sales",
+"grain": "Daily",
+"owner": "Product Management",
+"formula": "SUM(Product_X_Units_Sold)",
+"baseline_window_days": 30,
+"anomaly_threshold_pct": 0.0,
+"sources": ["POS_Terminal.realtime_sales"],
+"rbac_visibility": ["Regional Director", "Operations Analyst"],
+"drivers": ["Initial_Footfall", "Promo_Redemptions"]
+}
+]
+}
