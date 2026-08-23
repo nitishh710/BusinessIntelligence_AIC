@@ -123,7 +123,7 @@ def generate_llm_narrative(math_results, persona, scenario):
 
 # Sidebar UI
 with st.sidebar:
-    st.image("https://img.icons8.com/color/96/000000/brain--v1.png", width=60)
+    st.image("https://www.google.com/search?sca_esv=ce28c929e6d39ed6&sxsrf=APpeQns_Qn2CafjJKRDTjyq7ZjK3tVgRXw:1787458727886&udm=2&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8c4u0nXx4bEIpwm1lnNH832VstEKsVDqPorK0Gahnm2nq-aQnTz_mBV-EZYISbLc-StUIq_PhL7hb0Qt0YiIGOHqH0w9agDhJI7scVTX9bo8NT9KxcrOpq85urpuPX5V5gniRL8vgUJT_mRs8pKfxX8_1XfuHIMB2uRp9G3KLFcT2oWlQYaO5qodHLhdo3vqE4sEd5Ag&q=neural+network+crazy+logo&sa=X&ved=2ahUKEwjpwprU8rWWAxX91jgGHZBQHUYQtKgLegQIFxAB&biw=1474&bih=842&dpr=1.25#ip=1&sv=CAMSURoyKhBlLUgxcVRpbTRIZHQyVkNNMg5IMXFUaW00SGR0MlZDTToOYXl1WktHNmRvWVU4R00gBCoXCgFzEhBlLUgxcVRpbTRIZHQyVkNNGAEwARgHIJOSz-oESggQARgBIAEoAQ", width=60)
     st.title("BI.ai Engine")
     st.caption("Accenture Innovation Challenge - Round 2")
     st.markdown("---")
