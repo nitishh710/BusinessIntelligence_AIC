@@ -10,7 +10,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom styling for metrics and narrative boxes
 st.markdown("""
 <style>
     .main { background: #0e1117; color: #fafafa; }
@@ -20,9 +19,9 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Mock database ingestion
+# Data ingestion mock
 def generate_dataset(scenario):
-    if scenario == "1. Multi-Factor (Revenue Drop)":
+    if "Multi-Factor" in scenario:
         dates = pd.date_range(end=pd.Timestamp.today(), periods=6, freq='W')
         df = pd.DataFrame({
             "Week": [d.strftime("W%U") for d in dates],
@@ -32,7 +31,7 @@ def generate_dataset(scenario):
         })
         return df, "CRM_Sales_DB + AdTech_Platform"
 
-    elif scenario == "2. Low-Confidence (Missing Telemetry)":
+    elif "Low-Confidence" in scenario:
         df = pd.DataFrame({
             "Region": ["North America", "Europe", "Asia-Pacific", "Latin America"],
             "Promised_Delivery_Hrs": [24, 24, 48, 48],
@@ -41,7 +40,7 @@ def generate_dataset(scenario):
         })
         return df, "IoT_Warehouse_Telemetry"
 
-    elif scenario == "3. Sparse-History (New Launch)":
+    else:
         dates = pd.date_range(end=pd.Timestamp.today(), periods=4, freq='D')
         df = pd.DataFrame({
             "Day": [f"Day {i+1}" for i in range(len(dates))],
@@ -50,43 +49,39 @@ def generate_dataset(scenario):
         })
         return df, "POS_Terminal.realtime_sales"
 
-# Deterministic Math Layer (No LLM logic here)
+# Analytical math layer
 def run_deterministic_engine(df, scenario):
     start_time = time.time()
     results = {
-        "is_anomaly": False,
         "confidence_score": 1.0,
         "math_facts": {},
         "lineage": [],
         "can_synthesize": True
     }
 
-    if scenario == "1. Multi-Factor (Revenue Drop)":
+    if "Multi-Factor" in scenario:
         rev_change = ((df['Revenue'].iloc[-1] - df['Revenue'].iloc[-2]) / df['Revenue'].iloc[-2]) * 100
         ad_change = ((df['Ad_Spend'].iloc[-1] - df['Ad_Spend'].iloc[-2]) / df['Ad_Spend'].iloc[-2]) * 100
         
         results.update({
-            "is_anomaly": rev_change <= -5.0,
             "confidence_score": 0.96,
             "math_facts": {"Rev_Change": rev_change, "Ad_Change": ad_change, "Ad_Weight": 0.62},
-            "lineage": ["SQL Join: CRM + AdTech", f"Math: W06 Rev Δ {rev_change:.1f}%", "Variance Decomposition executed."]
+            "lineage": ["SQL Join: CRM + AdTech", f"Math: W06 Rev Change {rev_change:.1f}%", "Variance Decomposition executed."]
         })
 
-    elif scenario == "2. Low-Confidence (Missing Telemetry)":
+    elif "Low-Confidence" in scenario:
         missing_count = df['Actual_Delivery_Hrs'].isnull().sum()
         completeness = 1 - (missing_count / len(df))
         
         results.update({
-            "is_anomaly": True,
             "confidence_score": 0.22, 
             "can_synthesize": False,  
             "math_facts": {"Completeness": completeness, "Missing": "Asia-Pacific"},
             "lineage": ["IoT Stream Parsed", "Null values detected in APAC", "Confidence < 70% Threshold"]
         })
 
-    elif scenario == "3. Sparse-History (New Launch)":
+    else:
         results.update({
-            "is_anomaly": False,
             "confidence_score": 0.48, 
             "math_facts": {"N_Days": len(df), "Mean_Sales": df['Product_X_Sales'].mean()},
             "lineage": ["POS Data Queried", f"N={len(df)} days found (Req: 30)", "Z-score baseline bypassed"]
@@ -95,35 +90,34 @@ def run_deterministic_engine(df, scenario):
     results["latency"] = time.time() - start_time
     return results
 
-# Simulated LLM Output (Mocking API response)
+# Simulated LLM narrative generation
 def generate_llm_narrative(math_results, persona, scenario):
     time.sleep(0.8) 
-    tokens = random.randint(180, 320)
+    tokens = random.randint(250, 320)
     
     if not math_results["can_synthesize"]:
         return {
-            "narrative": f"**System Halted: Incomplete Data Picture**\n\nI'd normally synthesize a root cause for you here, but I must abstain. The system confidence score has fallen to **{math_results['confidence_score']*100:.0f}%**, which breaks our enterprise safety threshold. \n\nReviewing the lineage, there is a complete blackout of telemetry data from the Asia-Pacific node. Rather than hallucinating a probable cause, I recommend pausing the analysis and engaging IT to restore data integrity.",
-            "rec": {"Driver": "Missing APAC Telemetry", "Action": "Dispatch manual sync ping to APAC IoT Gateway.", "Impact": "Restore data integrity and unblock analysis.", "Owner": "IT Operations", "Monitor": "Poll API every 15m"},
+            "narrative": f"System Halted: Incomplete Data Picture\n\nI must abstain from synthesizing a root cause. The system confidence score has fallen to {math_results['confidence_score']*100:.0f}%, which breaks our enterprise safety threshold. Reviewing the lineage, there is a complete blackout of telemetry data from the Asia-Pacific node. Rather than hallucinating a probable cause, I recommend pausing the analysis and engaging IT.",
+            "rec": {"Driver": "Missing APAC Telemetry", "Lever": "Data Pipeline Restart", "Action": "Dispatch manual sync ping to APAC IoT Gateway.", "Impact": "Restore data integrity and unblock analysis.", "Owner": "IT Operations", "Confidence": "High (Procedural)", "Monitor": "Poll API every 15m"},
             "tokens": tokens, "cost": tokens * 0.000015
         }
 
-    if scenario == "1. Multi-Factor (Revenue Drop)":
+    if "Multi-Factor" in scenario:
         if persona == "Regional Director":
-            narr = f"**Observation: Top-line revenue declined {math_results['math_facts']['Rev_Change']:.1f}% this week.** \n\nThe variance decomposition model indicates that the primary driver is the recent **{math_results['math_facts']['Ad_Change']:.1f}% reduction in Ad Spend**, which accounts for approximately 62% of this drop. Organic demand remains stable. If the regional marketing budget is re-authorized, we project a rapid return to the expected growth trajectory."
-            rec = {"Driver": "Ad Spend Reduction", "Action": "Re-authorize $1,500 marketing budget for the region.", "Impact": "Recover top-line growth trajectory.", "Owner": "CMO", "Monitor": "Daily ROAS"}
+            narr = f"Looking at this week's numbers, we took a {math_results['math_facts']['Rev_Change']:.1f}% hit to top-line revenue.\n\nI ran a variance decomposition on the backend, and the primary driver is clear: the recent {math_results['math_facts']['Ad_Change']:.1f}% pullback in Ad Spend is driving about 62% of this drop. Organic demand remains steady. If we get that marketing budget re-authorized quickly, we should return to our expected growth trajectory."
+            rec = {"Driver": "Ad Spend Reduction", "Lever": "Regional Marketing Budget", "Action": "Re-authorize $1,500 marketing budget for the region.", "Impact": "Recover top-line growth trajectory.", "Owner": "CMO", "Confidence": "96% (Statistical)", "Monitor": "Daily ROAS"}
         else: 
-            narr = f"**Alert: W06 top-line revenue is down {math_results['math_facts']['Rev_Change']:.1f}%.** \n\nData lineage confirms this stems from CRM and AdTech joins. The deterministic math points to recent ad budget caps. The decomposition gives Ad Spend a weight of {math_results['math_facts']['Ad_Weight']}, making it the primary constraint. Data confidence is robust at 96%. We recommend contacting the growth team to audit campaign caps before it impacts next week's pacing."
-            rec = {"Driver": "Ad Spend Cap (Campaign Level)", "Action": "Audit campaign manager budget caps and lift constraints.", "Impact": "Unblock paid traffic flow.", "Owner": "Growth Marketing Lead", "Monitor": "Hourly pacing"}
+            narr = f"Alert: W06 top-line revenue is down {math_results['math_facts']['Rev_Change']:.1f}%.\n\nData lineage confirms this stems from CRM and AdTech joins. The deterministic math points to recent ad budget caps. The decomposition gives Ad Spend a weight of {math_results['math_facts']['Ad_Weight']}, making it the primary constraint. Data confidence is robust at 96%. We recommend contacting the growth team to audit campaign caps before it impacts next week's pacing."
+            rec = {"Driver": "Ad Spend Cap (Campaign Level)", "Lever": "Campaign Budget Constraints", "Action": "Audit campaign manager budget caps and lift constraints.", "Impact": "Unblock paid traffic flow.", "Owner": "Growth Marketing Lead", "Confidence": "96% (Statistical)", "Monitor": "Hourly pacing"}
 
-    elif scenario == "3. Sparse-History (New Launch)":
-        narr = f"**Launch Update:** Product X is showing early traction, averaging **{math_results['math_facts']['Mean_Sales']:.1f} units per day.** \n\n*Governance Note for {persona}:* The dataset only contains {math_results['math_facts']['N_Days']} days of live data. Statistical confidence is currently at {math_results['confidence_score']*100:.0f}%. We advise against making major supply chain commitments until the product hits our standard 30-day baseline maturity threshold."
-        rec = {"Driver": "New Product (Immature Baseline)", "Action": "Maintain steady inventory; strictly do not over-order.", "Impact": "Prevent warehouse liability before true demand is known.", "Owner": "Supply Chain Planning", "Monitor": "Daily Baseline Maturity Score"}
+    else:
+        narr = f"Launch Update: Product X is showing early traction, averaging {math_results['math_facts']['Mean_Sales']:.1f} units per day.\n\nGovernance Note for {persona}: The dataset only contains {math_results['math_facts']['N_Days']} days of live data. Statistical confidence is currently at {math_results['confidence_score']*100:.0f}%. We advise against making major supply chain commitments until the product hits our standard 30-day baseline maturity threshold."
+        rec = {"Driver": "New Product (Immature Baseline)", "Lever": "Inventory Reorder Point", "Action": "Maintain steady inventory; strictly do not over-order.", "Impact": "Prevent warehouse liability before true demand is known.", "Owner": "Supply Chain Planning", "Confidence": "Low (48%) - Needs more time", "Monitor": "Daily Baseline Maturity Score"}
 
     return {"narrative": narr, "rec": rec, "tokens": tokens, "cost": tokens * 0.000015}
 
-# Sidebar UI
+# Sidebar
 with st.sidebar:
-    # st.image("https://www.google.com/search?sca_esv=ce28c929e6d39ed6&sxsrf=APpeQns_Qn2CafjJKRDTjyq7ZjK3tVgRXw:1787458727886&udm=2&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8c4u0nXx4bEIpwm1lnNH832VstEKsVDqPorK0Gahnm2nq-aQnTz_mBV-EZYISbLc-StUIq_PhL7hb0Qt0YiIGOHqH0w9agDhJI7scVTX9bo8NT9KxcrOpq85urpuPX5V5gniRL8vgUJT_mRs8pKfxX8_1XfuHIMB2uRp9G3KLFcT2oWlQYaO5qodHLhdo3vqE4sEd5Ag&q=neural+network+crazy+logo&sa=X&ved=2ahUKEwjpwprU8rWWAxX91jgGHZBQHUYQtKgLegQIFxAB&biw=1474&bih=842&dpr=1.25#ip=1&sv=CAMSURoyKhBlLUgxcVRpbTRIZHQyVkNNMg5IMXFUaW00SGR0MlZDTToOYXl1WktHNmRvWVU4R00gBCoXCgFzEhBlLUgxcVRpbTRIZHQyVkNNGAEwARgHIJOSz-oESggQARgBIAEoAQ", width=60)
     st.title("BI.ai Engine")
     st.caption("Accenture Innovation Challenge - Round 2")
     st.markdown("---")
@@ -137,16 +131,14 @@ with st.sidebar:
     persona = st.selectbox("Select Role (RBAC)", ["Regional Director", "Operations Analyst"])
     
     st.markdown("---")
-    st.info(f"**Security Context:** Operating securely as `{persona}`. Narrative tone and action levers are dynamically adjusted.")
+    st.info(f"Security Context: Operating securely as {persona}. Narrative tone and action levers are dynamically adjusted.")
     
     st.markdown("---")
-    st.markdown("**Developed by Team [anshus24]**") 
-    # st.markdown("**Anshu Sharma**") 
-    # st.markdown("**Nitish **") 
-    # st.markdown("**Dipu Pradhan**") 
-# Main Dashboard layout
+    st.markdown("Developed by Team [Insert Team Name]") 
+
+# Main Workspace
 st.title("KPI Storytelling Copilot")
-st.markdown("*Hybrid Architecture: Deterministic Math Engine + Conversational AI Synthesizer*")
+st.markdown("Hybrid Architecture: Deterministic Math Engine + Conversational AI Synthesizer")
 
 df, source = generate_dataset(scenario)
 engine_results = run_deterministic_engine(df, scenario)
@@ -167,7 +159,7 @@ with col1:
 
 with col2:
     st.subheader("2. Contextual AI Copilot")
-    st.caption(f"Translating math into a strategic brief for: **{persona}**")
+    st.caption(f"Translating math into a strategic brief for: {persona}")
     
     with st.spinner("Analyzing data and generating brief..."):
         synthesis = generate_llm_narrative(engine_results, persona, scenario)
@@ -179,12 +171,15 @@ with col2:
     rec = synthesis["rec"]
     st.markdown(f"""
     * **Driver identified:** `{rec['Driver']}`
+    * **Controllable Lever:** `{rec['Lever']}`
     * **Recommended Action:** **{rec['Action']}**
     * **Expected Impact:** {rec['Impact']}
-    * **Task Owner:** `{rec['Owner']}` (Monitoring via: *{rec['Monitor']}*)
+    * **Task Owner:** `{rec['Owner']}`
+    * **Decision Confidence:** {rec['Confidence']}
+    * **Monitoring Plan:** {rec['Monitor']}
     """)
 
-# Telemetry footer
+# Telemetry
 st.markdown("---")
 st.markdown("#### Runtime Telemetry (Governance & IT Ops)")
 t1, t2, t3, t4 = st.columns(4)
@@ -193,4 +188,4 @@ t2.metric("LLM API Latency", "0.8420s")
 t3.metric("Tokens Consumed", synthesis['tokens'])
 t4.metric("Cost per Insight", f"${synthesis['cost']:.5f}")
 
-st.markdown("**Human-in-the-loop Feedback:** [ Approve ] | [ Flag for review ]")
+st.markdown("Human-in-the-loop Feedback: [ Approve ] | [ Flag for review ]")
