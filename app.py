@@ -134,7 +134,7 @@ with st.sidebar:
     st.info(f"Security Context: Operating securely as {persona}. Narrative tone and action levers are dynamically adjusted.")
     
     st.markdown("---")
-    st.markdown("Developed by Team [Insert Team Name]") 
+    st.markdown("Developed by Team [anshus24]") 
 
 # Main Workspace
 st.title("KPI Storytelling Copilot")
