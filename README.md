@@ -6,7 +6,8 @@ Problem Track 3: BusinessIntelligence.ai
 
 Live: https://nitishh710-businessintelligence-aic-app-ro5z0k.streamlit.app/#kpi-storytelling-copilot
 
-Watch the Prototype Demo Video Here
+Watch the Prototype Demo Video Here: https://youtu.be/ByzG0HqMZ6c
+
 
 Executive Summary
 
