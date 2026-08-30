@@ -4,6 +4,8 @@ Accenture Innovation Challenge 2026 - Round 2 Submission
 
 Problem Track 3: BusinessIntelligence.ai
 
+Live: https://nitishh710-businessintelligence-aic-app-ro5z0k.streamlit.app/#kpi-storytelling-copilot
+
 Watch the Prototype Demo Video Here
 
 Executive Summary
